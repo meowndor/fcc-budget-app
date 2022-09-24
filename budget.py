@@ -64,13 +64,30 @@ class Category:
             balance += i["amount"]
 
         total = "Total: {0:.2f}".format(balance)
-        # values = []
-        # description = []
-        # for i in self.ledger:
-        #     for key, value in i.items():
-        #         if key == "amount":
-        #             values.append(value)
-        #         elif key == "description":
-        #             description.append(value)
         return title+details+total
-        # def create_spend_chart(categories):
+
+
+def create_spend_chart(category):
+    categories = [item.label for item in category]
+    x_template = [[j for j in range(3)] for i in range(3)]
+    x_lst = []
+    for element in x_template:
+        for item in element:
+            x_lst.append(item)
+    x = "".join(map(str, x_lst))
+    y = ""
+    for i in range(100, -10, -10):
+        y += f"{i}|".rjust(4) + x + "\n"
+    line = f"{'-'*(3*3)}".rjust(13) + "\n"
+
+    padded = []
+    regroup = []
+    sub_regroup = []
+    for item in list(map(str, categories)):
+        padded.append(item.ljust(
+            len(max(list(map(str, categories)), key=len)), " "))
+
+    final = [[item[i].center(3) for item in padded]
+             for i in range(len(max(padded, key=len)))]
+    category = "".join(map(str, sub_regroup))
+    return final
