@@ -69,25 +69,45 @@ class Category:
 
 def create_spend_chart(category):
     categories = [item.label for item in category]
-    x_template = [[j for j in range(3)] for i in range(3)]
-    x_lst = []
-    for element in x_template:
-        for item in element:
-            x_lst.append(item)
-    x = "".join(map(str, x_lst))
-    y = ""
-    for i in range(100, -10, -10):
-        y += f"{i}|".rjust(4) + x + "\n"
-    line = f"{'-'*(3*3)}".rjust(13) + "\n"
+    # total expense each category
+    each_category_x = []
+    category_x_total_percent = []
+    for each in category:
+        each_category_x.append(sum([-1*i["amount"]
+                                    for i in each.ledger if i["amount"] < 0]))
+    for i in range(len(each_category_x)):
+        category_x_total_percent.append(
+            (each_category_x[i]/sum(each_category_x))*100)
 
+    def tick(percentage):
+        o = ""
+        for i in [round(rounded) for rounded in category_x_total_percent]:
+            if i >= percentage:
+                o += ("o".center(3))
+            else:
+                o += "   "
+        return o
+    line = []
+    for percentage in range(100, -10, -10):
+        line.append(str(percentage) + "|" + tick(percentage) + " " + "\n")
+    print_line = ""
+    for i in line:
+        print_line += str(i).rjust(15)
+    separator = "    " + "-"*3*len(categories) + "-"+"\n"
     padded = []
-    regroup = []
-    sub_regroup = []
     for item in list(map(str, categories)):
         padded.append(item.ljust(
             len(max(list(map(str, categories)), key=len)), " "))
 
-    final = [[item[i].center(3) for item in padded]
-             for i in range(len(max(padded, key=len)))]
-    category = "".join(map(str, sub_regroup))
-    return final
+    regroup = ["".join(map(str, [item[i].center(3) for item in padded]))
+               for i in range(len(max(padded, key=len)))]
+    label = ""
+    for i in regroup:
+        if i == regroup[-1]:
+            label += i.rjust(13) + " "
+        else:
+            label += i.rjust(13) + " " + "\n"
+
+    title = "Percentage spent by category" + "\n"
+    return title + print_line + separator + label
+    # return line
